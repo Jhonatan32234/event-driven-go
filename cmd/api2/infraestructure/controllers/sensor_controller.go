@@ -1,51 +1,53 @@
 package controllers
 
 import (
-	//"api/application/usecases"
-	//"api/domain/entities"
-
 	"event-driven/cmd/api2/application/useCases"
 	"event-driven/cmd/api2/domain/entities"
+	"event-driven/cmd/api2/infraestructure/adapters"
 	"log"
 	"net/http"
-
 	"github.com/gin-gonic/gin"
 )
 
-
-// Controlador para los datos del sensor
 type SensorController struct {
-	Usecase *useCases.SensorUsecase
+	Usecase        *useCases.SensorUsecase
+	FirebaseClient *adapters.FirebaseAdapter
 }
 
-// Método para recibir datos del sensor (POST)
 func (c *SensorController) ReceiveSensorData(ctx *gin.Context) {
 	var sensorData entities.SensorData
 	if err := ctx.ShouldBindJSON(&sensorData); err != nil {
-		// Si hay un error al leer los datos, devuelve un error 400
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Log para depuración
 	log.Printf("Datos del sensor recibidos: %v", sensorData)
-
-	// Almacena los datos del sensor en el repositorio
 	c.Usecase.Store(sensorData)
 
-	// Responde con un mensaje indicando que los datos se recibieron
 	ctx.JSON(http.StatusOK, gin.H{"message": "Sensor data received"})
 }
 
-
-// Método para enviar los datos del sensor (GET)
 func (c *SensorController) SendSensorData(ctx *gin.Context) {
-	// Recupera todos los datos almacenados
 	sensorData := c.Usecase.GetAll()
-
-	// Log para depuración
 	log.Printf("Datos del sensor recuperados: %v", sensorData)
 
-	// Devuelve los datos en formato JSON como respuesta
-	ctx.JSON(http.StatusOK, gin.H{"sensorData": sensorData})
+	// Lista de tokens simulada (estos deberían obtenerse de la base de datos)
+	tokens := []string{"BCRlsDQ15hN8fkXcPIEO3bVdrzOWUCUWbIIKu81_5Rrc-zzMmQ0PFo12ZvXuugt0uZe3oC9x5HQqpeUAAY8OBt4"}
+
+	for _, token := range tokens {
+		err := c.FirebaseClient.SendNotification(
+			"Nuevos datos del sensor",
+			"Se han registrado nuevos valores de temperatura y humedad.",
+			token,
+		)
+
+		if err != nil {
+			log.Printf("Error enviando notificación a %s: %v", token, err)
+		}
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"sensorData": sensorData,
+		"message":    "Datos enviados y notificaciones disparadas",
+	})
 }
