@@ -1,6 +1,18 @@
+# Establece la imagen base
 FROM golang:1.23
+
+# Establece el directorio de trabajo
 WORKDIR /app
+
+# Copia los archivos del proyecto al contenedor
 COPY . .
+
+# Copia el archivo de credenciales de Firebase
+COPY ./cmd/api2/serviceAccountKey.json /app/google-services.json
+
+# Instala las dependencias y construye el proyecto
 RUN go mod tidy
 RUN go build -o api2 cmd/api2/main.go
+
+# Inicia la aplicación
 CMD ["./api2"]
