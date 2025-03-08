@@ -1,0 +1,84 @@
+version: "1.0"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: sensor
+      MYSQL_USER: mydb
+      MYSQL_PASSWORD: mydb
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"  # Mensajería AMQP
+      - "15672:15672" # UI de administración
+
+  api1:
+    build:
+      context: .
+      dockerfile: Dockerfile.api1
+    container_name: api1
+    depends_on:
+      - mysql
+      - rabbitmq
+    environment:
+      DB_HOST: mysql
+      DB_USER: mydb
+      DB_PASSWORD: mydb
+      DB_NAME: mydb
+      RABBITUSER: guest
+      RABBITPASSWORD: guest
+      RABBITIP: rabbitmq
+      RABBITPORT: 5672
+    ports:
+      - "8080:8080"
+
+  api2:
+    build:
+      context: .
+      dockerfile: Dockerfile.api2
+    container_name: api2
+    ports:
+      - "8000:8000"
+
+  consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile.consumer
+    container_name: consumer
+    depends_on:
+      - rabbitmq
+      - api1
+    environment:
+      RABBITUSER: guest
+      RABBITPASSWORD: guest
+      RABBITIP: rabbitmq
+      RABBITPORT: 5672
+      IP_API: http://api1:8080
+      QUEUENEW: processedQueue
+
+  sensor-app:
+    build:
+      context: .  # El contexto está ahora en la raíz del proyecto
+      dockerfile: Dockerfile.front  # Especifica la ruta correcta al Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - api2
+
+volumes:
+  mysql_data:

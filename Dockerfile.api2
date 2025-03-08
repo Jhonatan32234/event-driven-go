@@ -1,0 +1,6 @@
+FROM golang:1.23
+WORKDIR /app
+COPY . .
+RUN go mod tidy
+RUN go build -o api2 cmd/api2/main.go
+CMD ["./api2"]
