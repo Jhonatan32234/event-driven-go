@@ -1,0 +1,20 @@
+# Usar la imagen base de Go
+FROM golang:1.23
+
+# Establecer el directorio de trabajo dentro del contenedor
+WORKDIR /app
+
+# Copiar go.mod y go.sum para descargar las dependencias
+COPY go.mod go.sum ./
+
+# Descargar las dependencias antes de copiar el código fuente
+RUN go mod tidy
+
+# Copiar todo el código fuente del proyecto al contenedor
+COPY . .
+
+# Construir la aplicación
+RUN go build -o /app/consumer consumer.go
+
+# Ejecutar la aplicación
+CMD ["/app/consumer"]

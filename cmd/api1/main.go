@@ -1,10 +1,10 @@
 package main
 
 import (
-	"event-driven/cmd/api1/core"
-	"event-driven/cmd/api1/src/application"
-	"event-driven/cmd/api1/src/domain"
-	"event-driven/cmd/api1/src/infraestructure/routes"
+	"api1/core"
+	"api1/src/application"
+	"api1/src/domain"
+	"api1/src/infraestructure/routes"
 	"log"
 )
 

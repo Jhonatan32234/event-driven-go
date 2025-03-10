@@ -1,4 +1,4 @@
-version: "1.0"
+version: "3.8"
 
 services:
   mysql:
@@ -28,7 +28,7 @@ services:
 
   api1:
     build:
-      context: .
+      context: ./cmd/api1 # El contexto es la raíz del proyecto, ya que tu Dockerfile está ahí
       dockerfile: Dockerfile.api1
     container_name: api1
     depends_on:
@@ -45,40 +45,6 @@ services:
       RABBITPORT: 5672
     ports:
       - "8080:8080"
-
-  api2:
-    build:
-      context: .
-      dockerfile: Dockerfile.api2
-    container_name: api2
-    ports:
-      - "8000:8000"
-
-  consumer:
-    build:
-      context: .
-      dockerfile: Dockerfile.consumer
-    container_name: consumer
-    depends_on:
-      - rabbitmq
-      - api1
-    environment:
-      RABBITUSER: guest
-      RABBITPASSWORD: guest
-      RABBITIP: rabbitmq
-      RABBITPORT: 5672
-      IP_API: http://api1:8080
-      QUEUENEW: processedQueue
-
-  sensor-app:
-    build:
-      context: .  # El contexto está ahora en la raíz del proyecto
-      dockerfile: Dockerfile.front  # Especifica la ruta correcta al Dockerfile
-    container_name: frontend
-    ports:
-      - "3000:80"
-    depends_on:
-      - api2
 
 volumes:
   mysql_data:

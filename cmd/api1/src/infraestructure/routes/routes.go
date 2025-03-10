@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"event-driven/cmd/api1/src/application"
-	"event-driven/cmd/api1/src/infraestructure/controllers"
+	"api1/src/application"
+	"api1/src/infraestructure/controllers"
 
 	"github.com/gin-gonic/gin"
 )

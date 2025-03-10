@@ -2,10 +2,11 @@ package main
 
 import (
 	"bytes"
+	"consumer/entities"
 	"encoding/json"
-	"event-driven/cmd/api1/src/domain/entities"
 	"log"
 	"net/http"
+
 	"github.com/streadway/amqp"
 )
 

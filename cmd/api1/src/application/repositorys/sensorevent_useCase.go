@@ -1,8 +1,8 @@
 package repositorys
 
 import (
-	"event-driven/cmd/api1/src/domain/entities"
-	"event-driven/cmd/api1/src/infraestructure/adapaters"
+	"api1/src/domain/entities"
+	"api1/src/infraestructure/adapaters"
 )
 
 

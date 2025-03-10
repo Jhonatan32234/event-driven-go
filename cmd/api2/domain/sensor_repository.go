@@ -1,8 +1,7 @@
 package domain
 
 import (
-	//"api/domain/entities"
-	"event-driven/cmd/api2/domain/entities"
+	"api2/domain/entities"
 	"log"
 	"sync"
 )

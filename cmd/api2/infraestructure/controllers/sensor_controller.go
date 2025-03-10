@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"event-driven/cmd/api2/application/useCases"
-	"event-driven/cmd/api2/domain/entities"
-	"event-driven/cmd/api2/infraestructure/adapters"
+	"api2/application/useCases"
+	"api2/domain/entities"
+	"api2/infraestructure/adapters"
 	"log"
 	"net/http"
 	"github.com/gin-gonic/gin"
@@ -32,7 +32,7 @@ func (c *SensorController) SendSensorData(ctx *gin.Context) {
 	log.Printf("Datos del sensor recuperados: %v", sensorData)
 
 	// Lista de tokens simulada (estos deberían obtenerse de la base de datos)
-	tokens := []string{"BCRlsDQ15hN8fkXcPIEO3bVdrzOWUCUWbIIKu81_5Rrc-zzMmQ0PFo12ZvXuugt0uZe3oC9x5HQqpeUAAY8OBt4"}
+	tokens := []string{"AIzaSyBT2zE5VRCiie6bsA2kEZBAkaieECpeLWM"}
 
 	for _, token := range tokens {
 		err := c.FirebaseClient.SendNotification(
