@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"event-driven/cmd/api1/src/application"
-	"event-driven/cmd/api1/src/domain/entities"
+	"api1/src/application"
+	"api1/src/domain/entities"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

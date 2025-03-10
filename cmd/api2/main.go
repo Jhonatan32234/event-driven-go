@@ -4,7 +4,7 @@ import (
 	"log"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
-	"event-driven/cmd/api2/infraestructure/routes"
+	"api2/infraestructure/routes"
 	"context"
 	"firebase.google.com/go"
 	"google.golang.org/api/option"
@@ -24,7 +24,7 @@ func main() {
 	}))
 
 	// Inicializar Firebase
-	opt := option.WithCredentialsFile("/app/google-services.json") // Asegúrate de tener el archivo JSON con las credenciales de Firebase
+	opt := option.WithCredentialsFile("serviceAccountKey.json") // Asegúrate de tener el archivo JSON con las credenciales de Firebase
 	app, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
 		log.Fatalf("Error inicializando Firebase: %v", err)

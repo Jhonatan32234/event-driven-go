@@ -1,8 +1,9 @@
 package adapaters
 
 import (
+	"api1/src/domain/entities"
 	"encoding/json"
-	"event-driven/cmd/api1/src/domain/entities"
+
 	"github.com/streadway/amqp"
 )
 

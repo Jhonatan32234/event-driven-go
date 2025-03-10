@@ -1,10 +1,10 @@
 package routes
 
 import (
-	"event-driven/cmd/api2/application/useCases"
-	"event-driven/cmd/api2/domain"
-	"event-driven/cmd/api2/infraestructure/adapters"
-	"event-driven/cmd/api2/infraestructure/controllers"
+	"api2/application/useCases"
+	"api2/domain"
+	"api2/infraestructure/adapters"
+	"api2/infraestructure/controllers"
 	"firebase.google.com/go/messaging"
 	"github.com/gin-gonic/gin"
 )
