@@ -1,8 +1,8 @@
 package useCases
 
 import (
-	"event-driven/cmd/api2/domain"
-	"event-driven/cmd/api2/domain/entities"
+	"api2/domain"
+	"api2/domain/entities"
 )
 
 // Caso de uso para manejar los datos del sensor

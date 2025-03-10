@@ -1,7 +1,7 @@
 package core
 
 import (
-	"event-driven/cmd/api1/src/domain/entities"
+	"api1/src/domain/entities"
 	"log"
 
 	"gorm.io/driver/mysql"

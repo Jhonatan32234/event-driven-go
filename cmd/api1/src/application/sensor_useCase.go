@@ -1,8 +1,8 @@
 package application
 
 import (
-	"event-driven/cmd/api1/src/domain"
-	"event-driven/cmd/api1/src/domain/entities"
+	"api1/src/domain"
+	"api1/src/domain/entities"
 )
 
 type SensorUseCase struct {

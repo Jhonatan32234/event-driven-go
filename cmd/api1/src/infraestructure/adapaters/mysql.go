@@ -1,8 +1,7 @@
 package adapaters
 
 import (
-	//"event-driven/src/domain/entities"
-	"event-driven/cmd/api1/src/domain/entities"
+	"api1/src/domain/entities"
 	"log"
 
 	"gorm.io/gorm"
