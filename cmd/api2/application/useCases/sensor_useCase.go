@@ -1,21 +1,37 @@
-package useCases
+package usecases
 
 import (
-	"api2/domain"
 	"api2/domain/entities"
+	"api2/domain/repositories"
+	"log"
 )
 
-// Caso de uso para manejar los datos del sensor
 type SensorUsecase struct {
-	Repo *domain.InMemorySensorRepository
+	Repository repositories.SensorRepository
 }
 
-// Método para almacenar los datos del sensor
-func (u *SensorUsecase) Store(sensorData entities.SensorData) {
-	u.Repo.Store(sensorData)
+func NewSensorUsecase(repository repositories.SensorRepository) *SensorUsecase {
+	return &SensorUsecase{
+		Repository: repository,
+	}
 }
 
-// Método para obtener todos los datos del sensor
-func (u *SensorUsecase) GetAll() []entities.SensorData {
-	return u.Repo.GetAll()
+func (uc *SensorUsecase) Store(sensorData entities.SensorData) error {
+	// Guardar datos del sensor
+	err := uc.Repository.Store(sensorData)
+	if err != nil {
+		log.Println("Error al guardar los datos del sensor:", err)
+		return err
+	}
+	return nil
+}
+
+func (uc *SensorUsecase) GetAll() ([]entities.SensorData, error) {
+	// Obtener todos los datos de los sensores
+	sensorData, err := uc.Repository.GetAll()
+	if err != nil {
+		log.Println("Error al obtener los datos del sensor:", err)
+		return nil, err
+	}
+	return sensorData, nil
 }

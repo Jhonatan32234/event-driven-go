@@ -104,7 +104,7 @@ func main() {
 	defer rmq.conn.Close()
 	defer rmq.channel.Close()
 
-	if err := rmq.ConsumeMessages("http://api2:8000/receive", "NEW_QUEUE"); err != nil {
+	if err := rmq.ConsumeMessages("http://api2:8000/api/receive", "NEW_QUEUE"); err != nil {
 		log.Fatalf("Error consumiendo mensajes: %v", err)
 	}
 }
