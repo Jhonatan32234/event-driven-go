@@ -13,9 +13,6 @@ RUN go mod tidy
 # Copiar todo el código fuente del proyecto al contenedor
 COPY . .
 
-# Copiar el archivo de credenciales de Firebase
-COPY serviceAccountKey.json /app/google-services.json
-
 # Construir la aplicación
 RUN go build -o /app/api2 main.go
 
