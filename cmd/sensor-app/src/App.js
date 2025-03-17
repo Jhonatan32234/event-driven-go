@@ -1,12 +1,12 @@
-// src/App.js
+// App.js
+import React from "react";
+import SensorTable from "./infraestructure/components/SensorTable.js";
 
-import React from 'react';
-import SensorDataDisplay from './components/SensorDataDisplay';
-
-const App = () => {
+function App() {
   return (
-    <div>
-      <SensorDataDisplay />
+    <div className="App">
+     
+      <SensorTable />
     </div>
   );
 }

@@ -2,10 +2,11 @@ package main
 
 import (
 	"bytes"
+	"consumer/entities"
 	"encoding/json"
-	"event-driven/cmd/api1/src/domain/entities"
 	"log"
 	"net/http"
+
 	"github.com/streadway/amqp"
 )
 
@@ -103,7 +104,7 @@ func main() {
 	defer rmq.conn.Close()
 	defer rmq.channel.Close()
 
-	if err := rmq.ConsumeMessages("http://api2:8000/receive", "NEW_QUEUE"); err != nil {
+	if err := rmq.ConsumeMessages("http://api2:8000/api/receive", "NEW_QUEUE"); err != nil {
 		log.Fatalf("Error consumiendo mensajes: %v", err)
 	}
 }

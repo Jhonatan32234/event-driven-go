@@ -1,23 +1,36 @@
 package routes
 
 import (
-	"event-driven/cmd/api2/application/useCases"
-	"event-driven/cmd/api2/domain"
-	"event-driven/cmd/api2/infraestructure/adapters"
-	"event-driven/cmd/api2/infraestructure/controllers"
-	"firebase.google.com/go/messaging"
+	"api2/infraestructure/controllers"
+
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter(router *gin.Engine, firebaseClient *messaging.Client) {
-	sensorRepo := &domain.InMemorySensorRepository{}
-	sensorUsecase := &useCases.SensorUsecase{Repo: sensorRepo}
-	firebaseAdapter := adapters.NewFirebaseAdapter(firebaseClient)
-	sensorController := &controllers.SensorController{
-		Usecase:        sensorUsecase,
-		FirebaseClient: firebaseAdapter,
+// SetupRouter configura las rutas del API
+func SetupRouter(router *gin.Engine, sensorController *controllers.SensorController) {
+	api := router.Group("/api")
+	{
+		api.POST("/receive", sensorController.ReceiveSensorData) // Recibe datos del sensor
+		api.GET("/send-data", sensorController.SendSensorData)   // Envía datos del sensor
+		api.POST("/subscribe", sensorController.SubscribeToken)  // Suscribe el token a Firebase
 	}
-
-	router.POST("/receive", sensorController.ReceiveSensorData)
-	router.GET("/send-data", sensorController.SendSensorData)
 }
+
+
+/*package routes
+
+import (
+	"api2/infraestructure/controllers"
+
+	"github.com/gin-gonic/gin"
+)
+
+// SetupRouter configura las rutas del API
+func SetupRouter(router *gin.Engine, sensorController *controllers.SensorController) {
+	api := router.Group("/api")
+	{
+		api.POST("/receive", sensorController.ReceiveSensorData) // Recibe datos del sensor
+		api.GET("/send-data", sensorController.SendSensorData)   // Envía datos del sensor
+	}
+}
+*/

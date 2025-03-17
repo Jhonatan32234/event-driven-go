@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  api2:
+    build:
+      context: ./cmd/api2  # El contexto es la raíz del proyecto
+      dockerfile: Dockerfile.api2
+    container_name: api2
+    ports:
+      - "8000:8000"
+
+  consumer:
+    build:
+      context: ./cmd/consumer  # El contexto es la raíz del proyecto
+      dockerfile: Dockerfile.consumer
+    container_name: consumer
+    depends_on:
+      - api2
+  
+  sensor-app:
+    build:
+      context: ./cmd/sensor-app  # El contexto debe ser el directorio de la aplicación frontend
+      dockerfile: Dockerfile.front  # Asegúrate de que este Dockerfile esté en cmd/sensor-app
+    container_name: frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - api2
