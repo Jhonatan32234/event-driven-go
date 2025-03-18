@@ -3,6 +3,8 @@ package usecases
 import (
 	"api2/domain/entities"
 	"api2/domain/repositories"
+	"api2/infraestructure/adapters"
+	"fmt"
 	"log"
 )
 
@@ -23,6 +25,16 @@ func (uc *SensorUsecase) Store(sensorData entities.SensorData) error {
 		log.Println("Error al guardar los datos del sensor:", err)
 		return err
 	}
+
+	// Enviar notificación a través de Firebase
+	title := "Nuevo dato del sensor"
+	body := fmt.Sprintf("Temperatura: %.2f, Humedad: %.2f", sensorData.Temperature, sensorData.Humidity)
+	err = adapters.SendNotification(title, body)
+	if err != nil {
+		log.Println("Error enviando notificación:", err)
+		return err
+	}
+
 	return nil
 }
 
