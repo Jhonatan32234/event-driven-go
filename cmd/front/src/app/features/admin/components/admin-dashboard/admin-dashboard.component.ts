@@ -71,7 +71,7 @@ export class AdminDashboardComponent implements OnInit {
         error: (err) => console.error('🚨 Error en la suscripción:', err),
       });
   }
-
+/*
   listenForMessages() {
     onMessage(this.messaging, (payload) => {
       console.log('Mensaje recibido en primer plano:', payload);
@@ -99,5 +99,58 @@ export class AdminDashboardComponent implements OnInit {
         },
       });
     });
-  }
+  }*/
+
+    listenForMessages() {
+      onMessage(this.messaging, (payload) => {
+        console.log('Mensaje recibido en primer plano:', payload);
+    
+        // Desglosar el mensaje para obtener el tipo
+        const body = payload.notification?.body as { tipo?: string };
+        const tipo = body?.tipo;
+    
+        // Determinar la alerta basada en el tipo
+        if (tipo === 'luz') {
+          // Alerta para "luz"
+          Swal.fire({
+            title: 'Alerta de luz',
+            text: 'Se ha detectado un cambio en la luz.',
+            icon: 'warning', // Puedes cambiar el icono si lo deseas
+            showConfirmButton: true,
+            confirmButtonText: 'Aceptar',
+            confirmButtonColor: '#3085d6',
+          });
+        } else if (tipo === 'movimiento') {
+          // Alerta para "movimiento"
+          Swal.fire({
+            title: 'Alerta de movimiento',
+            text: 'Se ha detectado movimiento.',
+            icon: 'warning',
+            showConfirmButton: true,
+            confirmButtonText: 'Aceptar',
+            confirmButtonColor: '#3085d6',
+          });
+        } else if (tipo === 'sonido') {
+          // Alerta para "sonido"
+          Swal.fire({
+            title: 'Alerta de sonido',
+            text: 'Se ha detectado un sonido.',
+            icon: 'warning',
+            showConfirmButton: true,
+            confirmButtonText: 'Aceptar',
+            confirmButtonColor: '#3085d6',
+          });
+        } else {
+          // Alerta general si no es 'luz', 'movimiento' o 'sonido'
+          Swal.fire({
+            title: 'Nueva notificación',
+            text: `Datos: ${JSON.stringify(payload.notification?.body)}`, // Muestra los datos del payload
+            icon: 'info',
+            showConfirmButton: true,
+            confirmButtonText: 'Aceptar',
+            confirmButtonColor: '#3085d6',
+          });
+        }
+      });
+    }
 }
