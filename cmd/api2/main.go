@@ -139,25 +139,16 @@ import (
 	"api2/dependencies"
 	"log"
 
-	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	// Inicializar el servidor, WebSocket y controlador
-	router, webSocketAdapter, _ := dependencies.InitializeServer()
+	router, _ := dependencies.InitializeServer()
 
 	// Iniciar WebSocket en un goroutine
-	go webSocketAdapter.Start()
+	
 
 	// WebSocket route
-	router.GET("/ws", func(c *gin.Context) {
-		conn, err := webSocketAdapter.Upgrader.Upgrade(c.Writer, c.Request, nil)
-		if err != nil {
-			log.Println("Error al establecer WebSocket:", err)
-			return
-		}
-		webSocketAdapter.HandleWebSocketConnection(conn)
-	})
 
 	// Iniciar el servidor en el puerto 8000
 	if err := router.Run(":8000"); err != nil {

@@ -33,7 +33,7 @@ func CorsMiddleware() gin.HandlerFunc {
 }
 
 // Inicializar y devolver las dependencias del servidor
-func InitializeServer() (*gin.Engine, *adapters.WebSocketAdapter, *controllers.SensorController) {
+func InitializeServer() (*gin.Engine, *controllers.SensorController) {
 	// Inicializar Firebase
 	err := adapters.InitializeFirebase()
 	if err != nil {
@@ -47,31 +47,19 @@ func InitializeServer() (*gin.Engine, *adapters.WebSocketAdapter, *controllers.S
 	router.Use(CorsMiddleware())
 
 	// Crear instancia del WebSocketAdapter
-	webSocketAdapter := adapters.NewWebSocketAdapter()
+	
 
 	// Crear instancia del repositorio (aquí usaremos un repositorio en memoria)
 	sensorRepository := repositories.NewInMemorySensorRepository()
-	luzRepository := repositories.NewInMemoryLuzRepository()
-	sonidoRepository := repositories.NewInMemorySonidoRepository()
-	movimientoRepository := repositories.NewInMemoryMovimientoRepository()
-
 
 	// Crear el caso de uso para manejar la lógica de negocio
 	sensorUsecase := usecases.NewSensorUsecase(sensorRepository)
-	luzUsecase := usecases.NewLuzUsecase(luzRepository)
-	sonidousecase := usecases.NewSonidoUsecase(sonidoRepository)
-	movimientoUsecase := usecases.NewMovimientoUsecase(movimientoRepository)
-
 
 	// Crear el controlador
-	sensorController := controllers.NewSensorController(sensorUsecase, webSocketAdapter)
-	luzController := controllers.NewLuzController(luzUsecase,webSocketAdapter)
-	sonidoController := controllers.NewSonidoController(sonidousecase,webSocketAdapter)
-	movimientoController := controllers.NewMovimientoController(movimientoUsecase,webSocketAdapter)
-
+	sensorController := controllers.NewSensorController(sensorUsecase)
 
 	// Configurar las rutas
-	routes.SetupRouter(router, sensorController,luzController,sonidoController,movimientoController)
+	routes.SetupRouter(router, sensorController)
 
-	return router, webSocketAdapter, sensorController
+	return router, sensorController
 }
