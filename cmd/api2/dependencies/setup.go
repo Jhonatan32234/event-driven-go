@@ -17,7 +17,7 @@ import (
 func CorsMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Configurar los encabezados CORS
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
@@ -45,9 +45,6 @@ func InitializeServer() (*gin.Engine, *controllers.SensorController) {
 
 	// Aplicar el middleware CORS antes de configurar las rutas
 	router.Use(CorsMiddleware())
-
-	// Crear instancia del WebSocketAdapter
-	
 
 	// Crear instancia del repositorio (aquí usaremos un repositorio en memoria)
 	sensorRepository := repositories.NewInMemorySensorRepository()

@@ -54,23 +54,20 @@ func (c *SensorController) SendSensorData(ctx *gin.Context) {
 
 // SubscribeToken maneja la suscripción del token a un tema en Firebase
 func (c *SensorController) SubscribeToken(ctx *gin.Context) {
-	log.Println("pasa aqui")
 	var request struct {
 		Token string `json:"token"`
+		Topic string `json:"topic"`
 	}
-	log.Println("pasa aqui2")
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Token requerido"})
 		return
 	}
-	log.Println("pasa aqui3")
-	// Suscribir el token al tema "all" en Firebase
-	err := adapters.SubscribeToTopic(request.Token, "all")
+	// Suscribir el token al tema en Firebase
+	err := adapters.SubscribeToTopic(request.Token, request.Topic)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error suscribiendo token: %v", err)})
 		return
 	}
-	log.Println("pasa aqui4")
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "Token suscrito correctamente"})
 }

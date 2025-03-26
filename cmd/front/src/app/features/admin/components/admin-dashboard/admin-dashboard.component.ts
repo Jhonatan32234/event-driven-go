@@ -24,8 +24,8 @@ export class AdminDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    //this.showNotificationButton();
-    //this.listenForMessages();
+    this.showNotificationButton();
+    this.listenForMessages();
     this.listenToSocket(); // Llamada para escuchar el WebSocket
   }
 
@@ -35,13 +35,13 @@ export class AdminDashboardComponent implements OnInit {
         if (permission === 'granted') {
           try {
             const token = await getToken(this.messaging, {
-              vapidKey:
-                'BE_jQIwsH6tcbrpUexwsWDYfJSknW_S5_7ryOExehA0ddeKw2DAKsmr6mCGl6iZwf8X11X6IiH9jmHh6LwqWHZM',
+              vapidKey: 'BE_jQIwsH6tcbrpUexwsWDYfJSknW_S5_7ryOExehA0ddeKw2DAKsmr6mCGl6iZwf8X11X6IiH9jmHh6LwqWHZM',
             });
             if (token) {
               console.log('Token recibido:', token);
               this.token = token;
-              this.subscribeToBackend(token);
+              const topic = 'notificacion'; // Define aquí el topic dinámicamente
+              this.subscribeToBackend(token, topic);
             }
           } catch (err) {
             console.error('Error obteniendo token de FCM:', err);
@@ -50,14 +50,16 @@ export class AdminDashboardComponent implements OnInit {
       })
       .catch((error) => console.error('Error solicitando permisos:', error));
   }
+  
 
-  private subscribeToBackend(token: string) {
-    this.http.post<{ message: string }>(`${this.backendUrl}/subscribe`, { token })
+  private subscribeToBackend(token: string, topic: string) {
+    this.http.post<{ message: string }>(`${this.backendUrl}/subscribe`, { token, topic })
       .subscribe({
         next: (res) => console.log(res.message),
         error: (err) => console.error('🚨 Error en la suscripción:', err),
       });
   }
+  
 
   listenForMessages() {
     onMessage(this.messaging, (payload) => {

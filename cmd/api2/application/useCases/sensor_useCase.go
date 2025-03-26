@@ -28,12 +28,13 @@ func (uc *SensorUsecase) Store(sensorData entities.SensorData) error {
 
 	// Enviar notificación a través de Firebase
 	title := "Nuevo dato del sensor"
+	topic := sensorData.Topic
 	body := fmt.Sprintf(
 		"id: %d, title: %s, descripcion: %s, emmiter: %s, topic: %s, created_at: %s",
 		sensorData.ID, sensorData.Title, sensorData.Description,
 		sensorData.Emmiter, sensorData.Topic, sensorData.CreatedAt,
 	)
-	err = adapters.SendNotification(title, body)
+	err = adapters.SendNotification(title, body, topic)
 	if err != nil {
 		log.Println("Error enviando notificación:", err)
 		return err
