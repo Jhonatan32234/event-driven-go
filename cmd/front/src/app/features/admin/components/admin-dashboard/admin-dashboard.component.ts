@@ -11,7 +11,7 @@ import Swal from 'sweetalert2';
 })
 export class AdminDashboardComponent implements OnInit {
   token: string = '';
-  private backendUrl = 'http://localhost:8000';
+  private backendUrl = 'https://guardiansensfcm.duckdns.org';
   private wsUrl = 'ws://localhost:5000/ws'; // URL para la conexión WebSocket
   private socket: WebSocket | null = null;
 
@@ -40,7 +40,7 @@ export class AdminDashboardComponent implements OnInit {
             if (token) {
               console.log('Token recibido:', token);
               this.token = token;
-              const topic = 'notificacion'; // Define aquí el topic dinámicamente
+              const topic = 'id0002'; // Define aquí el topic dinámicamente
               this.subscribeToBackend(token, topic);
             }
           } catch (err) {
@@ -82,7 +82,7 @@ export class AdminDashboardComponent implements OnInit {
             title: parsedData.title || 'Nueva Notificación',
             html: `
               <b>ID:</b> ${parsedData.id} <br>
-              <b>Descripción:</b> ${parsedData.descripcion} <br>
+              <b>Descripción:</b> ${parsedData.description} <br>
               <b>Emisor:</b> ${parsedData.emmiter} <br>
               <b>Tema:</b> ${parsedData.topic} <br>
               <b>Fecha:</b> ${parsedData.created_at} <br>
@@ -141,13 +141,14 @@ export class AdminDashboardComponent implements OnInit {
             title: 'Nuevo mensaje WebSocket',
             html: `
               <b>ID:</b> ${message.id} <br>
-              <b>Descripción:</b> ${message.descripcion} <br>
+              <b>Descripción:</b> ${message.description} <br>
               <b>Emisor:</b> ${message.emmiter} <br>
               <b>Tema:</b> ${message.topic} <br>
               <b>Fecha:</b> ${message.created_at} <br>
             `,
             icon: 'info',
-            confirmButtonText: 'Aceptar'
+            confirmButtonText: 'Aceptar',
+            
           });
   
           // Guardar el mensaje WebSocket en el arreglo

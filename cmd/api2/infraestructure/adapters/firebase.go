@@ -40,14 +40,12 @@ func SendNotification(title, body string, topic string) error {
 		log.Println("🚨 Firebase no está inicializado correctamente")
 		return fmt.Errorf("firebase no está inicializado")
 	}
-
 	ctx := context.Background()
 	client, err := App.Messaging(ctx)
 	if err != nil {
 		log.Println("🚨 Error obteniendo cliente de mensajería:", err)
 		return fmt.Errorf("error obteniendo cliente de mensajería: %v", err)
 	}
-
 	message := &messaging.Message{
 		Notification: &messaging.Notification{
 			Title: title,
@@ -55,7 +53,6 @@ func SendNotification(title, body string, topic string) error {
 		},
 		Topic: topic,
 	}
-
 	response, err := client.Send(ctx, message)
 	if err != nil {
 		log.Println("🚨 Error enviando mensaje a FCM:", err)
@@ -66,7 +63,6 @@ func SendNotification(title, body string, topic string) error {
 	return nil
 }
 
-// SubscribeToTopic suscribe un token a un tema en Firebase
 func SubscribeToTopic(token, topic string) error {
 	if App == nil {
 		return fmt.Errorf("firebase no está inicializado")
