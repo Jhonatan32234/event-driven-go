@@ -1,7 +1,10 @@
 package entities
 
 type SensorData struct {
-	ID          uint    `json:"id" gorm:"primaryKey"`
-	Temperature float64 `json:"temperature"`
-	Humidity    float64 `json:"humidity"`
+	ID          int    `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Emmiter     string `json:"emmiter"`
+	Topic       string `json:"topic"`
+	CreatedAt   string `json:"created_at"`
 }

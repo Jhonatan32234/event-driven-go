@@ -13,16 +13,15 @@ import (
 
 type SensorController struct {
 	Usecase         *usecases.SensorUsecase
-	WebSocketAdapter *adapters.WebSocketAdapter
 }
 
-func NewSensorController(usecase *usecases.SensorUsecase, websocketAdapter *adapters.WebSocketAdapter) *SensorController {
+func NewSensorController(usecase *usecases.SensorUsecase) *SensorController {
 	return &SensorController{
 		Usecase:         usecase,
-		WebSocketAdapter: websocketAdapter,
 	}
 }
 
+// ReceiveSensorData maneja la recepción de datos del sensor
 func (c *SensorController) ReceiveSensorData(ctx *gin.Context) {
 	var sensorData entities.SensorData
 	if err := ctx.ShouldBindJSON(&sensorData); err != nil {
@@ -37,15 +36,10 @@ func (c *SensorController) ReceiveSensorData(ctx *gin.Context) {
 		return
 	}
 
-	// Enviar los datos del sensor a los WebSockets conectados
-	message := fmt.Sprintf(`{"message": "Nuevo dato del sensor:","temperature":"%.2f","humidity":"%.2f"}`, sensorData.Temperature, sensorData.Humidity)
-    c.WebSocketAdapter.BroadcastMessage(message)
-
-
-
 	ctx.JSON(http.StatusOK, gin.H{"message": "Sensor data received"})
 }
 
+// SendSensorData devuelve todos los datos de los sensores almacenados
 func (c *SensorController) SendSensorData(ctx *gin.Context) {
 	sensorData, err := c.Usecase.GetAll()
 	if err != nil {
@@ -56,4 +50,24 @@ func (c *SensorController) SendSensorData(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"sensorData": sensorData,
 	})
+}
+
+// SubscribeToken maneja la suscripción del token a un tema en Firebase
+func (c *SensorController) SubscribeToken(ctx *gin.Context) {
+	var request struct {
+		Token string `json:"token"`
+		Topic string `json:"topic"`
+	}
+	if err := ctx.ShouldBindJSON(&request); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Token requerido"})
+		return
+	}
+	// Suscribir el token al tema en Firebase
+	err := adapters.SubscribeToTopic(request.Token, request.Topic)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error suscribiendo token: %v", err)})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "Token suscrito correctamente"})
 }

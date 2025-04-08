@@ -1,0 +1,36 @@
+.admin-dashboard {
+    text-align: center;
+    margin-top: 50px;
+  
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+  
+    .buttons-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+  
+    button {
+      width: 200px;
+      padding: 10px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+  
+      &:nth-child(1) { background: #4CAF50; color: white; }  /* Verde */
+      &:nth-child(2) { background: #2196F3; color: white; }  /* Azul */
+      &:nth-child(3) { background: #FF9800; color: white; }  /* Naranja */
+      &:nth-child(4) { background: #9C27B0; color: white; }  /* Morado */
+  
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
+  

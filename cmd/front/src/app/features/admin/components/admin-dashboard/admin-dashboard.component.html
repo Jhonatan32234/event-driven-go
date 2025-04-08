@@ -1,0 +1,21 @@
+<div class="admin-dashboard">
+  <h1>Panel de Notificaciones</h1>
+
+  <!-- Tabla para mostrar los mensajes -->
+  <table >
+    <thead>
+      <tr>
+        <th>Título</th>
+        <th>Mensaje</th>
+        <th>Tipo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let message of messages">
+        <td>{{ message.title }}</td>
+        <td>{{ message.body }}</td>
+        <td>{{ message.tipo }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
