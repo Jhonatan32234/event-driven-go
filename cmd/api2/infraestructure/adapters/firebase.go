@@ -2,9 +2,9 @@ package adapters
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
-	"os"
 
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/messaging"
@@ -14,12 +14,17 @@ import (
 var App *firebase.App
 
 func InitializeFirebase() error {
-	credsJSON := os.Getenv("FIREBASE_CREDENTIALS_JSON")
-	if credsJSON == "" {
-		return fmt.Errorf("FIREBASE_CREDENTIALS_JSON no está definida")
+	// Definimos las credenciales directamente en el código
+	creds := map[string]interface{}{
+		//ingresar aqui las credenciales
 	}
+	credsJSON, err := json.Marshal(creds)
+    if err != nil {
+        log.Fatalf("Error al convertir credenciales a JSON: %v", err)
+    }
 
-	opt := option.WithCredentialsJSON([]byte(credsJSON))
+	// Utiliza las credenciales directamente para inicializar Firebase
+	opt := option.WithCredentialsJSON(credsJSON)
 	app, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
 		return fmt.Errorf("error inicializando Firebase: %v", err)
@@ -30,27 +35,24 @@ func InitializeFirebase() error {
 	return nil
 }
 
-func SendNotification(title, body string) error {
+func SendNotification(title, body string, topic string) error {
 	if App == nil {
 		log.Println("🚨 Firebase no está inicializado correctamente")
 		return fmt.Errorf("firebase no está inicializado")
 	}
-
 	ctx := context.Background()
 	client, err := App.Messaging(ctx)
 	if err != nil {
 		log.Println("🚨 Error obteniendo cliente de mensajería:", err)
 		return fmt.Errorf("error obteniendo cliente de mensajería: %v", err)
 	}
-
 	message := &messaging.Message{
 		Notification: &messaging.Notification{
 			Title: title,
 			Body:  body,
 		},
-		Topic: "all",
+		Topic: topic,
 	}
-
 	response, err := client.Send(ctx, message)
 	if err != nil {
 		log.Println("🚨 Error enviando mensaje a FCM:", err)
@@ -61,7 +63,6 @@ func SendNotification(title, body string) error {
 	return nil
 }
 
-// SubscribeToTopic suscribe un token a un tema en Firebase
 func SubscribeToTopic(token, topic string) error {
 	if App == nil {
 		return fmt.Errorf("firebase no está inicializado")

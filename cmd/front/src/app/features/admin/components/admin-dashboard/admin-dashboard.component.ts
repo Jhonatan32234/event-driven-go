@@ -11,7 +11,12 @@ import Swal from 'sweetalert2';
 })
 export class AdminDashboardComponent implements OnInit {
   token: string = '';
-  private backendUrl = 'http://localhost:8000'; 
+  private backendUrl = 'https://guardiansensfcm.duckdns.org';
+  private wsUrl = 'ws://localhost:5000/ws'; // URL para la conexión WebSocket
+  private socket: WebSocket | null = null;
+
+  // Arreglo para almacenar los mensajes
+  public messages: any[] = [];
 
   constructor(
     @Inject(Messaging) private messaging: Messaging,
@@ -19,138 +24,150 @@ export class AdminDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.listenForMessages();
     this.showNotificationButton();
+    this.listenForMessages();
+    this.listenToSocket(); // Llamada para escuchar el WebSocket
   }
 
   showNotificationButton() {
-    Swal.fire({
-      title: '¿Deseas activar las notificaciones?',
-      text: 'Haz clic en el botón para habilitar las notificaciones.',
-      icon: 'info',
-      showCancelButton: true,
-      confirmButtonText: 'Activar Notificaciones',
-      cancelButtonText: 'Cancelar',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.requestPermission(); // Llamar a la función para activar notificaciones
-      }
-    });
-  }
-
-  requestPermission() {
     Notification.requestPermission()
       .then(async (permission) => {
         if (permission === 'granted') {
           try {
             const token = await getToken(this.messaging, {
-              vapidKey:
-                'BE_jQIwsH6tcbrpUexwsWDYfJSknW_S5_7ryOExehA0ddeKw2DAKsmr6mCGl6iZwf8X11X6IiH9jmHh6LwqWHZM',
+              vapidKey: 'BE_jQIwsH6tcbrpUexwsWDYfJSknW_S5_7ryOExehA0ddeKw2DAKsmr6mCGl6iZwf8X11X6IiH9jmHh6LwqWHZM',
             });
-//'BNiXbBcCoErAiquuylp5PsU2nT8I1Tj4fbX-JPzEj1nyb7A3lQuNxKdZuSy-J4W9QkhPFjT05SQC5s1cv64GlB8'
             if (token) {
               console.log('Token recibido:', token);
               this.token = token;
-
-              this.subscribeToBackend(token);
+              const topic = 'id0002'; // Define aquí el topic dinámicamente
+              this.subscribeToBackend(token, topic);
             }
           } catch (err) {
             console.error('Error obteniendo token de FCM:', err);
           }
-        } else {
-          console.warn('Permiso de notificaciones no concedido');
         }
       })
       .catch((error) => console.error('Error solicitando permisos:', error));
   }
+  
 
-  private subscribeToBackend(token: string) {
-    this.http.post<{ message: string }>(`${this.backendUrl}/api/subscribe`, { token })
+  private subscribeToBackend(token: string, topic: string) {
+    this.http.post<{ message: string }>(`${this.backendUrl}/subscribe`, { token, topic })
       .subscribe({
         next: (res) => console.log(res.message),
         error: (err) => console.error('🚨 Error en la suscripción:', err),
       });
   }
-/*
+  
+
   listenForMessages() {
     onMessage(this.messaging, (payload) => {
       console.log('Mensaje recibido en primer plano:', payload);
   
-      Swal.fire({
-        title: payload.notification?.title || 'Nueva Temperatura', // Título de la notificación
-        text: payload.notification?.body || 'Tienes un nuevo valor de temperatura.', // Cuerpo de la notificación
-        icon: 'info', // Icono (puedes cambiarlo a 'success', 'warning', 'error', etc.)
-        showConfirmButton: true, // Mostrar botón de confirmación
-        confirmButtonText: 'Aceptar', // Texto del botón
-        confirmButtonColor: '#3085d6', // Color del botón
-        customClass: {
-          popup: 'custom-popup', // Clase CSS personalizada para la ventana emergente
-          title: 'custom-title', // Clase CSS personalizada para el título
-          // content: 'custom-content', // Clase CSS personalizada para el contenido
-          confirmButton: 'custom-confirm-button', // Clase CSS personalizada para el botón
-        },
-        // Animación de entrada
-        showClass: {
-          popup: 'animate__animated animate__fadeInDown', // Animación de entrada
-        },
-        // Animación de salida
-        hideClass: {
-          popup: 'animate__animated animate__fadeOutUp', // Animación de salida
-        },
-      });
-    });
-  }*/
-
-    listenForMessages() {
-      onMessage(this.messaging, (payload) => {
-        console.log('Mensaje recibido en primer plano:', payload);
-    
-        // Desglosar el mensaje para obtener el tipo
-        const body = payload.notification?.body as { tipo?: string };
-        const tipo = body?.tipo;
-    
-        // Determinar la alerta basada en el tipo
-        if (tipo === 'luz') {
-          // Alerta para "luz"
+      const data = payload.notification?.body;
+      if (data) {
+        try {
+          // Verificar si 'data' ya es un JSON válido
+          let parsedData;
+          if (typeof data === 'string' && data.startsWith('{')) {
+            parsedData = JSON.parse(data); // Intentar parsear JSON
+          } else {
+            console.warn('El mensaje recibido no está en formato JSON:', data);
+            parsedData = this.convertToValidJson(data); // Intentar convertirlo
+          }
+  
+          // Mostrar la notificación con SweetAlert
           Swal.fire({
-            title: 'Alerta de luz',
-            text: 'Se ha detectado un cambio en la luz.',
-            icon: 'warning', // Puedes cambiar el icono si lo deseas
-            showConfirmButton: true,
-            confirmButtonText: 'Aceptar',
-            confirmButtonColor: '#3085d6',
-          });
-        } else if (tipo === 'movimiento') {
-          // Alerta para "movimiento"
-          Swal.fire({
-            title: 'Alerta de movimiento',
-            text: 'Se ha detectado movimiento.',
-            icon: 'warning',
-            showConfirmButton: true,
-            confirmButtonText: 'Aceptar',
-            confirmButtonColor: '#3085d6',
-          });
-        } else if (tipo === 'sonido') {
-          // Alerta para "sonido"
-          Swal.fire({
-            title: 'Alerta de sonido',
-            text: 'Se ha detectado un sonido.',
-            icon: 'warning',
-            showConfirmButton: true,
-            confirmButtonText: 'Aceptar',
-            confirmButtonColor: '#3085d6',
-          });
-        } else {
-          // Alerta general si no es 'luz', 'movimiento' o 'sonido'
-          Swal.fire({
-            title: 'Nueva notificación',
-            text: `Datos: ${JSON.stringify(payload.notification?.body)}`, // Muestra los datos del payload
+            title: parsedData.title || 'Nueva Notificación',
+            html: `
+              <b>ID:</b> ${parsedData.id} <br>
+              <b>Descripción:</b> ${parsedData.description} <br>
+              <b>Emisor:</b> ${parsedData.emmiter} <br>
+              <b>Tema:</b> ${parsedData.topic} <br>
+              <b>Fecha:</b> ${parsedData.created_at} <br>
+            `,
             icon: 'info',
-            showConfirmButton: true,
-            confirmButtonText: 'Aceptar',
-            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'Aceptar'
           });
+  
+          this.messages.push(parsedData);
+        } catch (error) {
+          console.error('❌ Error procesando el mensaje:', error, 'Mensaje:', data);
         }
-      });
-    }
+      }
+    });
+  }
+  
+  /**
+   * Intenta convertir un string con formato incorrecto en un objeto JSON válido
+   */
+  convertToValidJson(data: string) {
+    const keyValuePairs = data.split(',').map(pair => pair.split(':').map(s => s.trim()));
+    const jsonObject: any = {};
+    
+    keyValuePairs.forEach(([key, value]) => {
+      if (value.startsWith('"') || value.startsWith("'")) {
+        jsonObject[key] = value.replace(/['"]/g, '');
+      } else if (!isNaN(Number(value))) {
+        jsonObject[key] = Number(value);
+      } else {
+        jsonObject[key] = value;
+      }
+    });
+  
+    return jsonObject;
+  }
+
+  listenToSocket() {
+    this.socket = new WebSocket(this.wsUrl);
+  
+    this.socket.onopen = () => {
+      console.log("Conexión WebSocket establecida");
+    };
+  
+    this.socket.onmessage = (event) => {
+      try {
+        let message: any;
+        console.log('Mensaje recibido desde WebSocket:', event);
+        
+        // Verificar si el mensaje empieza con un carácter válido de JSON
+        if (event.data && event.data.startsWith('{')) {
+          message = JSON.parse(event.data); // Intentar parsear el JSON
+          console.log('Mensaje recibido desde WebSocket:', message);
+          
+          // Mostrar la notificación con SweetAlert
+          Swal.fire({
+            title: 'Nuevo mensaje WebSocket',
+            html: `
+              <b>ID:</b> ${message.id} <br>
+              <b>Descripción:</b> ${message.description} <br>
+              <b>Emisor:</b> ${message.emmiter} <br>
+              <b>Tema:</b> ${message.topic} <br>
+              <b>Fecha:</b> ${message.created_at} <br>
+            `,
+            icon: 'info',
+            confirmButtonText: 'Aceptar',
+            
+          });
+  
+          // Guardar el mensaje WebSocket en el arreglo
+          this.messages.push(message);
+        } else {
+          console.error('Mensaje no es un JSON válido:', event.data);
+        }
+      } catch (error) {
+        console.error('Error procesando el mensaje WebSocket:', error, 'Mensaje recibido:', event.data);
+      }
+    };
+  
+    this.socket.onerror = (error) => {
+      console.error('Error en la conexión WebSocket:', error);
+    };
+  
+    this.socket.onclose = () => {
+      console.log('Conexión WebSocket cerrada');
+    };
+  }
+  
 }
